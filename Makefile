@@ -15,4 +15,4 @@ run:
 	sh -c ./test
 
 clean:
-	rm -f test *.o core.*
+	rm -f test *.o core.* *~
