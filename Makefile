@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -g -lpthread
-#INCLUDES = -I /path
-#LIBS = -L /path
+INCLUDES = -I .
+LIBS = -L .
 
 all: test
 
@@ -11,5 +11,8 @@ test: test.o
 test.o: test.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c test.c
 
+run:
+	sh -c ./test
+
 clean:
-	rm -f ask1 ask2 *.o core.*
+	rm -f test *.o core.*
