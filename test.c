@@ -3,36 +3,45 @@
 #include <pthread.h>
 #include "_rw_locks.h"
 
+#define NR_THREADS 16
+
 void *init_function(void *ptr);
+pthread_mutex_t cmut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t wmut = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 int counter = 5;
+
+struct rw_lock_t *rwvar=NULL;
 
 int main(int argc, char **argv)
 {
-  struct rw_lock_t *rwvar=NULL;
-
-  if (rw_init(rwvar)) {
+  if (rw_init(&rwvar)) {
     perror("Initialization failed");
     exit(1);
   }
 
-  pthread_t thread1, thread2;
-  char *message1 = "Thread 1";
-  char *message2 = "Thread 2";
-  int ret1, ret2;
+  printf("readers: %d\nwriters: %d\n", rwvar->readers, rwvar->writers);
+
+  pthread_t threads[NR_THREADS];
+  int i;
+  char role[NR_THREADS]={'r','w','r','r','r','r','r','r','w','r','r','r','r','r','r','r'};
+  int ret[NR_THREADS];
 
   /* Create the independent threads
   calling the init function*/
 
-  ret1 = pthread_create(&thread1, NULL, init_function, (void *) message1);
-  ret2 = pthread_create(&thread2, NULL, init_function, (void *) message2);
+  for (i=0 ; i<NR_THREADS ; i++) {
+    ret[i] = pthread_create(&threads[i], NULL, init_function, (void *) role[i]);
+  }
 
-  pthread_join(thread1, NULL);
-  pthread_join(thread2, NULL);
+  for (i=0 ; i<NR_THREADS ; i++) {
+    pthread_join(threads[i], NULL);
+  }
 
-  printf("Thread 1 returns: %d\n", ret1);
-  printf("Thread 2 returns: %d\n", ret2);
+  /* printf("Thread 1 returns: %d\n", ret1); */
+  /* printf("Thread 2 returns: %d\n", ret2); */
 
-  if (rw_destroy(rwvar)) {
+  if (rw_destroy(&rwvar)) {
     perror("Destruction failed");
     exit(1);
   }
@@ -42,9 +51,14 @@ int main(int argc, char **argv)
 
 void * init_function(void *ptr)
 {
-  char *message=NULL;
-  message = (char *) ptr;
-  printf("%s Initialized.\n", message);
+  /* char *message=NULL; */
+  /* message = (char *) ptr; */
+  /* printf("%s Initialized.\n", message); */
+  char role;
+  role = (char) ptr;
+  printf("%c\n", role);
+  if (role == 'r')
+    rw_readlock(&rwvar);
 
   return 0;
 }
