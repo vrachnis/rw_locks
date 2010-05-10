@@ -9,6 +9,8 @@ void *init_function(void *ptr);
 pthread_mutex_t cmut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t wmut = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t rmut = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t rcond = PTHREAD_COND_INITIALIZER;
 int counter = 5;
 
 struct rw_lock_t *rwvar=NULL;
@@ -57,8 +59,16 @@ void * init_function(void *ptr)
   char role;
   role = (char) ptr;
   printf("%c\n", role);
-  if (role == 'r')
+  if (role == 'r') {
     rw_readlock(&rwvar);
+    printf("reading stuff\n");
+    rw_readunlock(&rwvar);
+  }
+  else {
+    rw_writelock(&rwvar);
+    printf("writing stuff...\n");
+    rw_writeunlock(&rwvar);
+  }
 
   return 0;
 }
