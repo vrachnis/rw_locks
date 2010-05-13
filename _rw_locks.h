@@ -57,7 +57,9 @@ rw_readlock(struct rw_lock_t **rw)
     printf("READER PANIC: %d\n", (*rw)->readers);
     exit(2);
   }
+  pthread_mutex_lock(&tempmut);
   (*rw)->r_wait++;
+  pthread_mutex_unlock(&tempmut);
   
   //printf("readers: %d\n", (*rw)->readers);
   
@@ -68,8 +70,10 @@ rw_readlock(struct rw_lock_t **rw)
   pthread_mutex_unlock(&cmut);
 
   pthread_mutex_lock(&rmut);
+  pthread_mutex_lock(&tempmut);
   (*rw)->r_wait--;
   (*rw)->readers++;
+  pthread_mutex_unlock(&tempmut);
   pthread_mutex_unlock(&rmut);
 
   return 0;
@@ -88,8 +92,11 @@ rw_readunlock(struct rw_lock_t **rw)
   /* printf("readers: %d\n", (*rw)->readers); */
 
   pthread_mutex_lock(&rmut);
+  pthread_mutex_lock(&tempmut);
   (*rw)->readers--;
+  pthread_mutex_unlock(&tempmut);
   if ((*rw)->readers == 0) {
+    //printf("waking writers...\n");
     pthread_cond_broadcast(&rcond);
   }
   pthread_mutex_unlock(&rmut);
@@ -100,14 +107,14 @@ rw_readunlock(struct rw_lock_t **rw)
 int
 rw_writelock(struct rw_lock_t **rw)
 {
-  pthread_mutex_lock(&tempmut);
+  pthread_mutex_lock(&cmut);
   (*rw)->writers++;
 
   if ((*rw)->writers > 2) {
-    printf("PANIC\n");
+    printf("WRITER PANIC\n");
     exit(2);
   }
-  pthread_mutex_unlock(&tempmut);
+  pthread_mutex_unlock(&cmut);
   
   //printf("writers: %d\n", (*rw)->writers);
 
@@ -124,13 +131,16 @@ rw_writelock(struct rw_lock_t **rw)
 
 int rw_writeunlock(struct rw_lock_t **rw)
 {
+  pthread_mutex_lock(&cmut);
   (*rw)->writers--;
+  pthread_mutex_unlock(&cmut);
   
   //printf("writers: %d\n", (*rw)->writers);
 
   pthread_mutex_lock(&cmut);
   //(*rw)->writers--;
   if ((*rw)->writers == 0) {
+    //printf("waking readers\n");
     pthread_cond_broadcast(&cond);
   }
   pthread_mutex_unlock(&cmut);
