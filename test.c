@@ -31,7 +31,7 @@ int main(int argc, char **argv)
   calling the init function*/
 
   for (i=0 ; i<NR_THREADS ; i++) {
-    ret[i] = pthread_create(&threads[i], NULL, init_function, (void *) role[i]);
+    ret[i] = pthread_create(&threads[i], NULL, init_function, (void *) &role[i]);
   }
 
   for (i=0 ; i<NR_THREADS ; i++) {
@@ -57,7 +57,7 @@ void
   /* message = (char *) ptr; */
   /* printf("%s Initialized.\n", message); */
   char role;
-  role = (char) ptr;
+  role = *(char*) ptr;
   printf("%c\n", role);
   if (role == 'r') {
     int mine;
