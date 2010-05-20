@@ -10,6 +10,13 @@
 /* extern pthread_cond_t rcond; */
 /* extern pthread_cond_t tempmut; */
 
+pthread_mutex_t cmut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t wmut = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t rmut = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t rcond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t tempmut = PTHREAD_MUTEX_INITIALIZER;
+
 int 
 rw_init(struct rw_lock_t **rw)
 {
