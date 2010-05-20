@@ -6,13 +6,6 @@ struct rw_lock_t {
   int writers; /* writers that have locked the variable */
 };
 
-//pthread_mutex_t cmut = PTHREAD_MUTEX_INITIALIZER;
-//pthread_mutex_t wmut = PTHREAD_MUTEX_INITIALIZER;
-//pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-//pthread_mutex_t rmut = PTHREAD_MUTEX_INITIALIZER;
-//pthread_cond_t rcond = PTHREAD_COND_INITIALIZER;
-//pthread_mutex_t tempmut = PTHREAD_MUTEX_INITIALIZER;
-
 int rw_init(struct rw_lock_t **rw);
 int rw_destroy(struct rw_lock_t **rw);
 int rw_readlock(struct rw_lock_t **rw);

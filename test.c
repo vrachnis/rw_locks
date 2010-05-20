@@ -64,7 +64,6 @@ void
     for (;;) {
       rw_readlock(&rwvar);
       mine = counter;
-      //printf("%d ", mine);
       rw_readunlock(&rwvar);
       if (mine == TERM_NR) {
 	printf("reader done %d:%d:%d\n",rwvar->r_wait,rwvar->readers,rwvar->writers);
@@ -90,7 +89,7 @@ int
 inc()
 {
   if (counter < TERM_NR) {
-    printf("+");
+    /* printf("+"); */
     counter++;
     return 0;
   }
