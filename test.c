@@ -1,6 +1,7 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <stdio.h>
+
 #include "_rw_locks.h"
 
 #define NR_THREADS 16
@@ -82,7 +83,7 @@ void
       }
     }
   }
-
+  
 }
 
 int
