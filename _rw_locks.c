@@ -12,15 +12,19 @@ pthread_cond_t ReaderCondition = PTHREAD_COND_INITIALIZER;
 int 
 rw_init(struct rw_lock_t *rw)
 {
-  if ((rw = (struct rw_lock_t*) malloc(sizeof(struct rw_lock_t))) == NULL) {
+  struct rw_lock_t *temp;
+
+  if ((temp = (struct rw_lock_t*) malloc(sizeof(struct rw_lock_t))) == NULL) {
     perror("Malloc failed.");
     exit(1);
   }
 
-  (rw)->readers = 0;
-  (rw)->writers = 0;
+  temp->readers = 0;
+  temp->writers = 0;
 
-  if ((rw)->readers == 0 && (rw)->writers == 0)
+  rw=temp;
+
+  if (rw->readers == 0 && rw->writers == 0)
     return 0;
   else
     return 1;
