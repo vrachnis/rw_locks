@@ -6,9 +6,9 @@ struct rw_lock_t {
 };
 
 int rw_init(struct rw_lock_t *rw);
-int rw_destroy(struct rw_lock_t **rw);
-int rw_readlock(struct rw_lock_t **rw);
-int rw_readunlock(struct rw_lock_t **rw);
-int rw_writelock(struct rw_lock_t **rw);
-int rw_writeunlock(struct rw_lock_t **rw);
+int rw_destroy(struct rw_lock_t *rw);
+int rw_readlock(struct rw_lock_t *rw);
+int rw_readunlock(struct rw_lock_t *rw);
+int rw_writelock(struct rw_lock_t *rw);
+int rw_writeunlock(struct rw_lock_t *rw);
 #endif
