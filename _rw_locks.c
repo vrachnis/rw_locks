@@ -10,17 +10,17 @@ pthread_mutex_t ReaderConditionMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t ReaderCondition = PTHREAD_COND_INITIALIZER;
 
 int 
-rw_init(struct rw_lock_t **rw)
+rw_init(struct rw_lock_t *rw)
 {
-  if ((*rw = (struct rw_lock_t *) malloc(sizeof(struct rw_lock_t))) == NULL) {
+  if ((rw = (struct rw_lock_t*) malloc(sizeof(struct rw_lock_t))) == NULL) {
     perror("Malloc failed.");
     exit(1);
   }
 
-  (*rw)->readers = 0;
-  (*rw)->writers = 0;
+  (rw)->readers = 0;
+  (rw)->writers = 0;
 
-  if ((*rw)->readers == 0 && (*rw)->writers == 0)
+  if ((rw)->readers == 0 && (rw)->writers == 0)
     return 0;
   else
     return 1;

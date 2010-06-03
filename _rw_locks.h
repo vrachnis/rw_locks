@@ -5,7 +5,7 @@ struct rw_lock_t {
   int writers; /* writers that have locked the variable */
 };
 
-int rw_init(struct rw_lock_t **rw);
+int rw_init(struct rw_lock_t *rw);
 int rw_destroy(struct rw_lock_t **rw);
 int rw_readlock(struct rw_lock_t **rw);
 int rw_readunlock(struct rw_lock_t **rw);

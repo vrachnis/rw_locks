@@ -15,7 +15,7 @@ struct rw_lock_t *rwvar=NULL;
 
 int main(int argc, char **argv)
 {
-  if (rw_init(&rwvar)) {
+  if (rw_init(rwvar)) {
     perror("Initialization failed");
     exit(1);
   }
