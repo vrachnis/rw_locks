@@ -10,7 +10,7 @@ LIBFILE= librwlock.a
 TARGET = test
 
 CC = gcc
-CFLAGS = -Wall -g -lpthread -std=c90
+CFLAGS = -Wall -g -lpthread -std=c89
 #CFLAGS = -pipe -std=c99 -pedantic -Wall -Wno-missing-braces -Wextra -Wno-missing-field-initializers -Wno-unused-parameter -D_XOPEN_SOURCE=600
 #DBGFLAGS = -g -fPIC 
 
@@ -35,5 +35,6 @@ clean:
 	@$(ECHO) " * Cleaning up..."
 	@rm -f ${LIBOBJ} ${TESTOBJ} ${LIBFILE} *~ ${TARGET}
 
-run:
-	sh -c ./test
+run: all
+	@$(ECHO) " * Running..."
+	@sh -c ./test
