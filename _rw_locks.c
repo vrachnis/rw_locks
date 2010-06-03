@@ -8,7 +8,6 @@ pthread_mutex_t WriteReaderConditionMutexex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t WriteReaderConditionition = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t ReaderConditionMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t ReaderCondition = PTHREAD_COND_INITIALIZER;
-pthread_mutex_t ReaderChMutex = PTHREAD_MUTEX_INITIALIZER;
 
 int 
 rw_init(struct rw_lock_t **rw)
@@ -19,10 +18,9 @@ rw_init(struct rw_lock_t **rw)
   }
 
   (*rw)->readers = 0;
-  (*rw)->r_wait = 0;
   (*rw)->writers = 0;
 
-  if ((*rw)->readers == 0 && (*rw)->r_wait == 0 && (*rw)->writers == 0)
+  if ((*rw)->readers == 0 && (*rw)->writers == 0)
     return 0;
   else
     return 1;
@@ -37,7 +35,6 @@ rw_destroy(struct rw_lock_t **rw)
   pthread_mutex_destroy(&WriteReaderConditionitionMutex);
   pthread_mutex_destroy(&WriteReaderConditionMutexex);
   pthread_mutex_destroy(&ReaderConditionMutex);
-  pthread_mutex_destroy(&ReaderChMutex);
 
   return 0;
 }
@@ -49,9 +46,6 @@ rw_readlock(struct rw_lock_t **rw)
     printf("READER PANIC: %d\n", (*rw)->readers);
     exit(2);
   }
-  pthread_mutex_lock(&ReaderChMutex);
-  (*rw)->r_wait++;
-  pthread_mutex_unlock(&ReaderChMutex);
   
   pthread_mutex_lock(&WriteReaderConditionitionMutex);
   while((*rw)->writers > 0) {
@@ -60,10 +54,7 @@ rw_readlock(struct rw_lock_t **rw)
   pthread_mutex_unlock(&WriteReaderConditionitionMutex);
 
   pthread_mutex_lock(&ReaderConditionMutex);
-  pthread_mutex_lock(&ReaderChMutex);
-  (*rw)->r_wait--;
   (*rw)->readers++;
-  pthread_mutex_unlock(&ReaderChMutex);
   pthread_mutex_unlock(&ReaderConditionMutex);
 
   return 0;
@@ -77,13 +68,8 @@ rw_readunlock(struct rw_lock_t **rw)
     exit(2);
   }
 
-  /* printf("waiting readers: %d\n", (*rw)->r_wait); */
-  /* printf("readers: %d\n", (*rw)->readers); */
-
   pthread_mutex_lock(&ReaderConditionMutex);
-  pthread_mutex_lock(&ReaderChMutex);
   (*rw)->readers--;
-  pthread_mutex_unlock(&ReaderChMutex);
   if ((*rw)->readers == 0) {
     pthread_cond_broadcast(&ReaderCondition);
   }

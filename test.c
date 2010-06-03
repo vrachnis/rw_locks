@@ -20,7 +20,7 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  printf("readers waiting: %d\nreaders: %d\nwriters: %d\n", rwvar->r_wait, rwvar->readers, rwvar->writers);
+  printf("readers: %d\nwriters: %d\n", rwvar->readers, rwvar->writers);
 
   pthread_t threads[NR_THREADS];
   int i;
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     pthread_join(threads[i], NULL);
   }
 
-  printf("readers waiting: %d\nreaders: %d\nwriters: %d\n", rwvar->r_wait, rwvar->readers, rwvar->writers);
+  printf("readers: %d\nwriters: %d\n", rwvar->readers, rwvar->writers);
   /* printf("Thread 1 returns: %d\n", ret1); */
   /* printf("Thread 2 returns: %d\n", ret2); */
 
@@ -66,7 +66,7 @@ void
       mine = counter;
       rw_readunlock(&rwvar);
       if (mine == TERM_NR) {
-	printf("reader done %d:%d:%d\n",rwvar->r_wait,rwvar->readers,rwvar->writers);
+	printf("reader done %d:%d\n",rwvar->readers,rwvar->writers);
 	pthread_exit(NULL);
       }
     }

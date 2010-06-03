@@ -2,7 +2,6 @@
 #define RW_LOCK
 struct rw_lock_t {
   int readers; /* readers that have locked the variable */
-  int r_wait; /* readers waiting to lock the variable */
   int writers; /* writers that have locked the variable */
 };
 
