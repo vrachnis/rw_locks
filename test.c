@@ -15,7 +15,9 @@ struct rw_lock_t *rwvar=NULL;
 
 int main(int argc, char **argv)
 {
-  if (rw_init(&rwvar)) {
+  rwvar = (struct rw_lock_t *)malloc(sizeof(struct rw_lock_t));
+
+  if (rw_init(rwvar)) {
     perror("Initialization failed");
     exit(1);
   }
@@ -42,7 +44,7 @@ int main(int argc, char **argv)
   /* printf("Thread 1 returns: %d\n", ret1); */
   /* printf("Thread 2 returns: %d\n", ret2); */
 
-  if (rw_destroy(&rwvar)) {
+  if (rw_destroy(rwvar)) {
     perror("Destruction failed");
     exit(1);
   }
@@ -62,9 +64,9 @@ void
   if (role == 'r') {
     int mine;
     for (;;) {
-      rw_readlock(&rwvar);
+      rw_readlock(rwvar);
       mine = counter;
-      rw_readunlock(&rwvar);
+      rw_readunlock(rwvar);
       if (mine == TERM_NR) {
 	printf("reader done %d:%d\n",rwvar->readers,rwvar->writers);
 	pthread_exit(NULL);
@@ -74,9 +76,9 @@ void
   else {
     int ret;
     for (;;) {
-      rw_writelock(&rwvar);
+      rw_writelock(rwvar);
       ret = inc();
-      rw_writeunlock(&rwvar);
+      rw_writeunlock(rwvar);
       if (ret) {
 	pthread_exit(NULL);
       }

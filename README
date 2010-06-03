@@ -6,8 +6,8 @@ The purpose of this was to learn about the mechanics behind thread synchronizati
 If you want to use this you have to follow these steps:
 
 -declare a rw_lock_t pointer (struct rw_lock_t *rwvar=NULL)
--initialize the pointer (rw_init(&rwvar))
--call rw_readlockr/rw_readunlock/rw_writelock/rw_writeunlock when needed (rw_writelock(&rwvar))
--when finished, call rw_destroy to free the allocated memory (rw_destroy(&rwvar))
+-initialize the pointer (rw_init(rwvar))
+-call rw_readlockr/rw_readunlock/rw_writelock/rw_writeunlock when needed (rw_writelock(rwvar))
+-when finished, call rw_destroy to free the allocated memory (rw_destroy(rwvar))
 
-See the file LICENCE for licencing information.
+See the file LICENSE for licencing information.
