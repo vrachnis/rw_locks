@@ -6,22 +6,22 @@
 int 
 rw_init(struct rw_lock_t *rw)
 {
-  struct rw_lock_t *temp;
+  struct rw_lock_t temp={0,0,PTHREAD_MUTEX_INITIALIZER,PTHREAD_MUTEX_INITIALIZER,PTHREAD_COND_INITIALIZER,PTHREAD_MUTEX_INITIALIZER,PTHREAD_COND_INITIALIZER};
 
-  if ((temp = (struct rw_lock_t*) malloc(sizeof(struct rw_lock_t))) == NULL) {
-    perror("Malloc failed.");
-    exit(1);
-  }
+  /* if ((temp = (struct rw_lock_t*) malloc(sizeof(struct rw_lock_t))) == NULL) { */
+  /*   perror("Malloc failed."); */
+  /*   exit(1); */
+  /* } */
 
-  temp->readers = 0;
-  temp->writers = 0;
-  /* (*rw)->WriterConditionMutex = PTHREAD_MUTEX_INITIALIZER; */
-  /* (*rw)->WriterMutex = PTHREAD_MUTEX_INITIALIZER; */
-  /* (*rw)->WriterCondition = PTHREAD_COND_INITIALIZER; */
-  /* (*rw)->ReaderConditionMutex = PTHREAD_MUTEX_INITIALIZER; */
-  /* (*rw)->ReaderCondition = PTHREAD_COND_INITIALIZER; */
+  /* temp->readers = 0; */
+  /* temp->writers = 0; */
+  /* /\* temp->WriterConditionMutex = PTHREAD_MUTEX_INITIALIZER; *\/ */
+  /* /\* temp->WriterMutex = PTHREAD_MUTEX_INITIALIZER; *\/ */
+  /* /\* temp->WriterCondition = PTHREAD_COND_INITIALIZER; *\/ */
+  /* /\* temp->ReaderConditionMutex = PTHREAD_MUTEX_INITIALIZER; *\/ */
+  /* /\* temp->ReaderCondition = PTHREAD_COND_INITIALIZER; *\/ */
 
-  rw=temp;
+  *rw=temp;
 
   if (rw->readers == 0 && rw->writers == 0)
     return 0;
@@ -37,7 +37,7 @@ rw_destroy(struct rw_lock_t *rw)
   pthread_mutex_destroy(&rw->WriterConditionMutex);
   pthread_mutex_destroy(&rw->WriterMutex);
   pthread_mutex_destroy(&rw->ReaderConditionMutex);
-  freerw;
+  free(rw);
 
   return 0;
 }
