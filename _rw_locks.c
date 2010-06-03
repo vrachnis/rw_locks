@@ -1,13 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
+/* #include <pthread.h> */
 #include "_rw_locks.h"
-
-pthread_mutex_t WriteReaderConditionitionMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t WriteReaderConditionMutexex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t WriteReaderConditionition = PTHREAD_COND_INITIALIZER;
-pthread_mutex_t ReaderConditionMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t ReaderCondition = PTHREAD_COND_INITIALIZER;
 
 int 
 rw_init(struct rw_lock_t **rw)
@@ -19,6 +13,11 @@ rw_init(struct rw_lock_t **rw)
 
   (*rw)->readers = 0;
   (*rw)->writers = 0;
+  /* (*rw)->WriterConditionMutex = PTHREAD_MUTEX_INITIALIZER; */
+  /* (*rw)->WriterMutex = PTHREAD_MUTEX_INITIALIZER; */
+  /* (*rw)->WriterCondition = PTHREAD_COND_INITIALIZER; */
+  /* (*rw)->ReaderConditionMutex = PTHREAD_MUTEX_INITIALIZER; */
+  /* (*rw)->ReaderCondition = PTHREAD_COND_INITIALIZER; */
 
   if ((*rw)->readers == 0 && (*rw)->writers == 0)
     return 0;
@@ -29,12 +28,12 @@ rw_init(struct rw_lock_t **rw)
 int
 rw_destroy(struct rw_lock_t **rw)
 {
+  pthread_cond_destroy(&(*rw)->WriterCondition);
+  pthread_cond_destroy(&(*rw)->ReaderCondition);
+  pthread_mutex_destroy(&(*rw)->WriterConditionMutex);
+  pthread_mutex_destroy(&(*rw)->WriterMutex);
+  pthread_mutex_destroy(&(*rw)->ReaderConditionMutex);
   free(*rw);
-  pthread_cond_destroy(&WriteReaderConditionition);
-  pthread_cond_destroy(&ReaderCondition);
-  pthread_mutex_destroy(&WriteReaderConditionitionMutex);
-  pthread_mutex_destroy(&WriteReaderConditionMutexex);
-  pthread_mutex_destroy(&ReaderConditionMutex);
 
   return 0;
 }
@@ -47,15 +46,15 @@ rw_readlock(struct rw_lock_t **rw)
     exit(2);
   }
   
-  pthread_mutex_lock(&WriteReaderConditionitionMutex);
+  pthread_mutex_lock(&(*rw)->WriterConditionMutex);
   while((*rw)->writers > 0) {
-    pthread_cond_wait(&WriteReaderConditionition, &WriteReaderConditionitionMutex);
+    pthread_cond_wait(&(*rw)->WriterCondition, &(*rw)->WriterConditionMutex);
   }
-  pthread_mutex_unlock(&WriteReaderConditionitionMutex);
+  pthread_mutex_unlock(&(*rw)->WriterConditionMutex);
 
-  pthread_mutex_lock(&ReaderConditionMutex);
+  pthread_mutex_lock(&(*rw)->ReaderConditionMutex);
   (*rw)->readers++;
-  pthread_mutex_unlock(&ReaderConditionMutex);
+  pthread_mutex_unlock(&(*rw)->ReaderConditionMutex);
 
   return 0;
 }
@@ -68,12 +67,12 @@ rw_readunlock(struct rw_lock_t **rw)
     exit(2);
   }
 
-  pthread_mutex_lock(&ReaderConditionMutex);
+  pthread_mutex_lock(&(*rw)->ReaderConditionMutex);
   (*rw)->readers--;
   if ((*rw)->readers == 0) {
-    pthread_cond_broadcast(&ReaderCondition);
+    pthread_cond_broadcast(&(*rw)->ReaderCondition);
   }
-  pthread_mutex_unlock(&ReaderConditionMutex);
+  pthread_mutex_unlock(&(*rw)->ReaderConditionMutex);
 
   return 0;
 }
@@ -81,22 +80,22 @@ rw_readunlock(struct rw_lock_t **rw)
 int
 rw_writelock(struct rw_lock_t **rw)
 {
-  pthread_mutex_lock(&WriteReaderConditionitionMutex);
+  pthread_mutex_lock(&(*rw)->WriterConditionMutex);
   (*rw)->writers++;
 
   if ((*rw)->writers > 2) {
     printf("WRITER PANIC\n");
     exit(2);
   }
-  pthread_mutex_unlock(&WriteReaderConditionitionMutex);
+  pthread_mutex_unlock(&(*rw)->WriterConditionMutex);
   
-  pthread_mutex_lock(&ReaderConditionMutex);
+  pthread_mutex_lock(&(*rw)->ReaderConditionMutex);
   while((*rw)->readers > 0) {
-    pthread_cond_wait(&ReaderCondition, &ReaderConditionMutex);
+    pthread_cond_wait(&(*rw)->ReaderCondition, &(*rw)->ReaderConditionMutex);
   }
-  pthread_mutex_unlock(&ReaderConditionMutex);
+  pthread_mutex_unlock(&(*rw)->ReaderConditionMutex);
 
-  pthread_mutex_lock(&WriteReaderConditionMutexex);
+  pthread_mutex_lock(&(*rw)->WriterMutex);
 
   return 0;
 }
@@ -104,17 +103,17 @@ rw_writelock(struct rw_lock_t **rw)
 int
 rw_writeunlock(struct rw_lock_t **rw)
 {
-  pthread_mutex_lock(&WriteReaderConditionitionMutex);
+  pthread_mutex_lock(&(*rw)->WriterConditionMutex);
   (*rw)->writers--;
-  pthread_mutex_unlock(&WriteReaderConditionitionMutex);
+  pthread_mutex_unlock(&(*rw)->WriterConditionMutex);
   
-  pthread_mutex_lock(&WriteReaderConditionitionMutex);
+  pthread_mutex_lock(&(*rw)->WriterConditionMutex);
   if ((*rw)->writers == 0) {
-    pthread_cond_broadcast(&WriteReaderConditionition);
+    pthread_cond_broadcast(&(*rw)->WriterCondition);
   }
-  pthread_mutex_unlock(&WriteReaderConditionitionMutex);
+  pthread_mutex_unlock(&(*rw)->WriterConditionMutex);
 
-  pthread_mutex_unlock(&WriteReaderConditionMutexex);
+  pthread_mutex_unlock(&(*rw)->WriterMutex);
 
   return 0;
 }
